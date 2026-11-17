@@ -1613,7 +1613,12 @@ updateBus(dt){const b=this.bus;if(!b)return;
   const wp=b.route[b.routeIdx];b.tx=wp[0];b.tz=wp[1];
   const want=Math.atan2(b.tx-b.x,b.tz-b.z);const steer=clamp(angDiff(b.th,want)*2,-1,1);
   let thr=.7;if(Math.abs(angDiff(b.th,want))>1)thr=.2;
-  const ax=b.x+Math.sin(b.th)*.5,c.z+fz*9,rz*.5,0xff2020,1.2,.4);},
+  this.physics(b,dt,thr,steer,false,true);
+  if(dist(b.x,b.z,b.tx,b.tz)<8){b.routeIdx=(b.routeIdx+1)%b.route.length;if(!b.loopRoute&&b.routeIdx===0){b.ai="idle";thr=0;}}
+  b.grp.position.set(b.x,0,b.z);b.grp.rotation.y=b.th;
+  const fx=Math.sin(b.th),fz=Math.cos(b.th),rx=Math.cos(b.th),rz=-Math.sin(b.th);
+  GLOW.set(b.gH,b.x+fx*4.4-rx*.6,1,b.z+fz*4.4-rz*.6,0xfff2cc,1.6,.5);
+  GLOW.set(b.gT,b.x-fx*4.4-rx*.6,1,b.z-fz*4.4+rz*.6,0xff2020,1.2,.4);},
 /* ---- chopper ---- */
 updateChopper(dt){const stars=wantedStars();
   if(stars>=4&&!this.chopper&&!G.roof){const grp=new THREE.Group();
