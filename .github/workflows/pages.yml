@@ -3,23 +3,15 @@ name: Deploy GitHub Pages
 on:
   push:
     branches: [main]
-  # Manual trigger: pick any branch (and optionally a specific commit SHA)
-  # from the "Run workflow" dropdown on the Actions tab.
+  # Manual trigger: type any branch name into the "branch" field that appears
+  # on the "Run workflow" screen (free-text input, so it works for every
+  # branch without editing this file).
   workflow_dispatch:
     inputs:
-      ref:
-        description: "Branch or tag to build and deploy from"
+      branch:
+        description: "Branch to build and publish to Pages (e.g. main, dev, feature/x)"
         required: true
         default: main
-        type: choice
-        options:
-          - main
-          # Add your other branch names here so they appear in the dropdown, e.g.:
-          # - dev
-          # - feature/experiment
-      sha:
-        description: "Optional exact commit SHA (leave empty to use the branch head)"
-        required: false
         type: string
 
 permissions:
@@ -38,10 +30,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # When triggered manually, build from the selected branch/tag (and
-          # optional SHA); otherwise check out the branch that triggered the run.
-          ref: ${{ inputs.ref || github.ref }}
-          sha: ${{ inputs.sha || '' }}
+          # Manual runs: check out the branch typed into the "branch" input
+          # (falls back to the branch the workflow was launched from).
+          # Push runs: check out the pushed branch as usual.
+          ref: ${{ inputs.branch || github.ref_name }}
 
       # Static site: index.html lives at the repo root, so publish it directly.
       - name: Setup Pages
